@@ -15,7 +15,7 @@ from typing import Mapping, Any, Union, TypeVar
 T = TypeVar('T')
 
 
-def safely_get_value(dct: Mapping, key: Any, default: Union[T, None] = None) -> Union[Any, T]:
+def safely_get_value(dct: Mapping, key: Any, default: Union[T, None] = None) -> Union[Any, T]:  # noqa
     """
     Returns the value associated with a key in a dictionary, or a default value
     if the key is not in the dictionary.
