@@ -11,12 +11,14 @@ import asyncio
 from typing import List
 wait_random = __import__('0-basic_async_syntax').wait_random
 
+
 async def wait_n(n: int, max_delay: int) -> List[float]:
     """
     Asynchronous coroutine that spawns `wait_random` n times with the specified
     max_delay and returns the list of all the delays in ascending order.
 
-    This function uses the asyncio.gather function to run the coroutines concurrently.
+    This function uses the asyncio.gather function to run the coroutines
+    concurrently.
     It then sorts the resulting delays and returns them.
 
     Args:
