@@ -12,11 +12,11 @@ of org examples to pass to GithubOrgClient, in this order:
 Of course, no external HTTP calls should be made.
 """
 import unittest
+import json
 from unittest.mock import patch, PropertyMock, Mock
-from client import GithubOrgClient
 from parameterized import parameterized, parameterized_class
 from fixtures import TEST_PAYLOAD
-import json
+from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -70,7 +70,3 @@ class TestGithubOrgClient(unittest.TestCase):
         """Test GithubOrgClient.has_license."""
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
-
-
-if __name__ == "__main__":
-    unittest.main()
