@@ -27,11 +27,11 @@ class TestGithubOrgClient(unittest.TestCase):
         ("abc",)
     ])
     @patch('client.get_json')
-    def test_org(self, org, get_json):
+    def test_org(self, input, mock):
         """Test that GithubOrgClient.org returns the correct value."""
-        org_client = GithubOrgClient(org)
-        self.assertEqual(org_client.org, get_json.return_value)
-        get_json.assert_called_once()
+        test_class = GithubOrgClient(input)
+        test_class.org()
+        mock.assert_called_once_with(f'https://api.github.com/orgs/{input}')
 
     def test_public_repos_url(self):
         """Test GithubOrgClient._public_repos_url."""
