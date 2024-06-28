@@ -12,10 +12,11 @@ of org examples to pass to GithubOrgClient, in this order:
 Of course, no external HTTP calls should be made.
 """
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock, Mock
 from client import GithubOrgClient
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
 from fixtures import TEST_PAYLOAD
+import json
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -25,12 +26,22 @@ class TestGithubOrgClient(unittest.TestCase):
         ("google",),
         ("abc",)
     ])
-    @patch('client.get_json', return_value="example.com")
+    @patch('client.get_json')
     def test_org(self, org, get_json):
         """Test that GithubOrgClient.org returns the correct value."""
         org_client = GithubOrgClient(org)
         self.assertEqual(org_client.org, get_json.return_value)
         get_json.assert_called_once()
+
+    def test_public_repos_url(self):
+        """Test GithubOrgClient._public_repos_url."""
+        with patch('client.GithubOrgClient.org',
+                   new_callable=PropertyMock) as mock:
+            payload = {"repos_url": "World"}
+            mock.return_value = payload
+            test_class = GithubOrgClient('test')
+            result = test_class._public_repos_url
+            self.assertEqual(result, payload["repos_url"])
 
 
 if __name__ == "__main__":
