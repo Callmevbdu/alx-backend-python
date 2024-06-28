@@ -23,12 +23,12 @@ class TestGithubOrgClient(unittest.TestCase):
     """Test suite for GithubOrgClient"""
 
     @parameterized.expand([
-        ("google"),
-        ("abc")
+        ('google'),
+        ('abc')
     ])
     @patch('client.get_json')
     def test_org(self, input, mock):
-        """Test that GithubOrgClient.org returns the correct value."""
+        """Test that GithubOrgClient.org"""
         test_class = GithubOrgClient(input)
         test_class.org()
         mock.assert_called_once_with(f'https://api.github.com/orgs/{input}')
@@ -70,3 +70,57 @@ class TestGithubOrgClient(unittest.TestCase):
         """Test GithubOrgClient.has_license."""
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
+
+
+@parameterized_class(
+    ("org_payload", "repos_payload", "expected_repos", "apache2_repos"),
+    TEST_PAYLOAD
+)
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """ Class for Integration test of fixtures """
+    @classmethod
+    def setUpClass(cls):
+        """
+        Prepares the environment for integration tests by configuring a mock
+        for requests.get. The mock returns specific payloads based on the URL.
+        """
+        config = {'return_value.json.side_effect':
+                  [
+                      cls.org_payload, cls.repos_payload,
+                      cls.org_payload, cls.repos_payload
+                  ]
+                  }
+        cls.get_patcher = patch('requests.get', **config)
+        cls.mock = cls.get_patcher.start()
+
+    def test_public_repos(self):
+        """
+        An integration test for the public_repos method in the GithubOrgClient
+        class. It verifies organization and repository payloads, as well as
+        expected repositories. The mock.assert_called() ensures the
+        requests.get function was called.
+        """
+        test_class = GithubOrgClient("google")
+        self.assertEqual(test_class.org, self.org_payload)
+        self.assertEqual(test_class.repos_payload, self.repos_payload)
+        self.assertEqual(test_class.public_repos(), self.expected_repos)
+        self.assertEqual(test_class.public_repos("XLICENSE"), [])
+        self.mock.assert_called()
+
+    def test_public_repos_with_license(self):
+        """
+        Similar to the previous test, this one focuses on the public_repos
+        method with a license filter. It checks whether repositories with the
+        specified license match the expected list.
+        """
+        test_class = GithubOrgClient("google")
+        self.assertEqual(test_class.public_repos(), self.expected_repos)
+        self.assertEqual(test_class.public_repos("XLICENSE"), [])
+        self.assertEqual(test_class.public_repos(
+            "apache-2.0"), self.apache2_repos)
+        self.mock.assert_called()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Stops the patch for requests.get."""
+        cls.get_patcher.stop()
