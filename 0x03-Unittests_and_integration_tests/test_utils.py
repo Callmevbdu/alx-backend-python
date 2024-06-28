@@ -14,7 +14,7 @@ expected result.
 The body of the test method should not be longer than 2 lines.
 """
 import unittest
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 from parameterized import parameterized
 from unittest.mock import patch
 
@@ -69,6 +69,29 @@ class TestGetJson(unittest.TestCase):
             result = get_json(url)
             self.assertEqual(result, test_payload)
             mock_get.assert_called_with(url)
+
+
+class TestMemoize(unittest.TestCase):
+    """
+    Test Memoize Class.
+    """
+    def test_memoize(self):
+        """
+         Test that memoization works correctly for a_property.
+        """
+        class TestClass:
+            """
+            Test for TestClass Class.
+            """
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                """
+                Memoized property that calls a_method and caches the result.
+                """
+                return self.a_method()
 
 
 if __name__ == "__main__":
