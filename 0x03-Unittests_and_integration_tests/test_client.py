@@ -62,17 +62,14 @@ class TestGithubOrgClient(unittest.TestCase):
             mock_public.assert_called_once()
             mock_json.assert_called_once()
 
-    @patch('client.GithubOrgClient.org', return_value={})
-    @patch('client.GithubOrgClient._public_repos_url', return_value="https://api.github.com/orgs/google/repos")  # noqa
-    def test_has_license(self, mock_repos_url, mock_org):
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False)
+    ])
+    def test_has_license(self, repo, license_key, expected):
         """Test GithubOrgClient.has_license."""
-        org_client = GithubOrgClient("example_org")
-
-        repo1 = {"license": {"key": "my_license"}}
-        self.assertTrue(org_client.has_license(repo1, "my_license"))
-
-        repo2 = {"license": {"key": "other_license"}}
-        self.assertFalse(org_client.has_license(repo2, "my_license"))
+        result = GithubOrgClient.has_license(repo, license_key)
+        self.assertEqual(result, expected)
 
 
 if __name__ == "__main__":
