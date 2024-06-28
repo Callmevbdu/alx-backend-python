@@ -54,22 +54,22 @@ class TestGetJson(unittest.TestCase):
     """
     Unit tests for the get_json function.
     """
-    @patch('requests.get')
-    def test_get_json(self, mock_get):
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False})
+    ])
+    def test_get_json(self, test_url, test_payload):
         """
         Test that get_json returns the expected result.
         Mocks the requests.get method to return a test_payload.
         Verifies that the function correctly handles different URLs.
         """
-        test_payload = {"payload": True}
-        mock_get.return_value.json.return_value = test_payload
-
-        urls = ["http://example.com", "http://holberton.io"]
-        for url in urls:
-            result = get_json(url)
-            self.assertEqual(result, test_payload)
-            mock_get.assert_called_with(url)
-
+        config = {'return_value.json.return_value': test_payload}
+        patcher = patch('requests.get', **config)
+        mock = patcher.start()
+        self.assertEqual(get_json(test_url), test_payload)
+        mock.assert_called_once()
+        patcher.stop()
 
 class TestMemoize(unittest.TestCase):
     """
