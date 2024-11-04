@@ -48,7 +48,7 @@ class TestGithubOrgClient(unittest.TestCase):
 
     def test_public_repos_url(self) -> None:
         """Test GithubOrgClient._public_repos_url."""
-        with patch('client.GithubOrgClient.org',
+        with patch('GithubOrgClient.org',
                    new_callable=PropertyMock) as mock:
             payload = {"repos_url": "World"}
             mock.return_value = payload
